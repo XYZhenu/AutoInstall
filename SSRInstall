@@ -1,0 +1,19 @@
+#!/bin/bash
+
+echo -e "y\n" "\n" | yum install git
+git clone -b manyuser https://github.com/XYZhenu/shadowsocksr.git
+cd shadowsocksr
+./initcfg.sh
+IP=$(ifconfig -a|grep -o -e 'inet [0-9]\{1,3\}.[0-9]\{1,3\}.[0-9]\{1,3\}.[0-9]\{1,3\}'|grep -v "127.0.0"|awk '{print $2}')
+sed -i "s/0.0.0.0/$IP/" ./user-config.json
+sed -i "s/aes-128-ctr/rc4-md5/" ./user-config.json
+sed -i "s/auth_aes128_md5/auth_chain_a/" ./user-config.json
+sed -i "s/tls1.2_ticket_auth_compatible/plain/" ./user-config.json
+sed -i "s/\"fast_open\": false/\"fast_open\": true/" ./user-config.json
+
+echo "/root/shadowsocksr/shadowsocksr/run.sh" >> /etc/rc.d/rc.local
+chmod +x /etc/rc.d/rc.local
+wget --no-check-certificate https://github.com/teddysun/across/raw/master/bbr.sh
+chmod +x bbr.sh
+echo -e "\n" "yes\n" |  ./bbr.sh
+reboot
