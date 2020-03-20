@@ -1,0 +1,15 @@
+#!/usr/bin/expect
+
+set timeout 30
+set IP [lindex $argv 0]
+set password [lindex $argv 1]
+send_user $password\n
+spawn ssh root@$IP
+expect {
+        "yes/no" { send "yes\n" }
+        "password:" { send "$password\n" }
+}
+expect "#"
+send "wget https://raw.githubusercontent.com/XYZhenu/AutoInstall/master/SSRInstall && chmod +x SSRInstall && ./SSRInstall\n"
+interact
+expect eof
